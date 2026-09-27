@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Outline Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F6F9;--card:#FFFFFF;--ink:#16203A;--muted:#596279;--rule:#D8DEE8;
+  --hl:#FFE36E;--hl-ink:#16203A;--accent:#2946C4;--accent-ink:#FFFFFF;
+  --good:#1B7552;--good-bg:#DBF1E5;--bad:#B42318;--bad-bg:#FCE3E0;--close:#8A5D00;--close-bg:#FFF0C7;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E131E;--card:#161D2C;--ink:#E5E9F1;--muted:#98A1B6;--rule:#2A3349;
+  --hl:#51440F;--hl-ink:#FFF4C9;--accent:#8FA3FF;--accent-ink:#0E131E;
+  --good:#63D39E;--good-bg:#11362A;--bad:#FF8C82;--bad-bg:#3B1714;--close:#F3C451;--close-bg:#382D0E;}}
+:root[data-theme="dark"]{
+  --paper:#0E131E;--card:#161D2C;--ink:#E5E9F1;--muted:#98A1B6;--rule:#2A3349;
+  --hl:#51440F;--hl-ink:#FFF4C9;--accent:#8FA3FF;--accent-ink:#0E131E;
+  --good:#63D39E;--good-bg:#11362A;--bad:#FF8C82;--bad-bg:#3B1714;--close:#F3C451;--close-bg:#382D0E;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:0 1.1rem 4rem}
+header.top{max-width:720px;margin:0 auto;padding:1rem 1.1rem .5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{font-family:Literata,Georgia,serif;font-weight:700;font-size:1.15rem;letter-spacing:-.01em;display:flex;align-items:center;gap:.5rem}
+.brand .mark{display:inline-block;width:1.6rem;height:.85rem;background:var(--hl);border-bottom:2px solid var(--ink);border-radius:2px;transform:skewX(-8deg)}
+h1{font-family:Literata,Georgia,serif;font-weight:700;font-size:clamp(1.7rem,5vw,2.3rem);line-height:1.15;letter-spacing:-.02em;margin:1.2rem 0 .6rem}
+h2{font-family:Literata,Georgia,serif;font-size:1.2rem;margin:2rem 0 .75rem;font-weight:600}
+p{margin:.4rem 0}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.btn{appearance:none;border:1.5px solid var(--rule);background:var(--card);border-radius:10px;padding:.62rem 1rem;font-weight:600;cursor:pointer;min-height:44px;line-height:1.2}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--accent);padding-left:.4rem;padding-right:.4rem}
+.btn.danger{color:var(--bad)}
+.btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,.chip:focus-visible,.deck:focus-visible,.mode:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.decks{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.deck{display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:.9rem 1rem;cursor:pointer}
+.deck:hover{border-color:var(--ink)}
+.deck b{display:block;font-weight:600}
+.pill{font-size:.8rem;font-weight:700;border-radius:99px;padding:.2rem .6rem;background:var(--hl);color:var(--hl-ink);white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:1rem 0}
+.stat{background:var(--card);border:1.5px solid var(--rule);border-radius:10px;padding:.6rem .7rem}
+.stat b{display:block;font-size:1.35rem;font-family:Literata,Georgia,serif}
+.stat span{font-size:.8rem;color:var(--muted)}
+.bar{height:8px;background:var(--rule);border-radius:99px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.field{margin:1.1rem 0}
+.field label,.flabel{display:block;font-weight:600;margin-bottom:.4rem}
+.seg{display:flex;flex-wrap:wrap;gap:.35rem}
+.seg button{border:1.5px solid var(--rule);background:var(--card);border-radius:99px;padding:.45rem .85rem;cursor:pointer;font-weight:600;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+select,input[type=date],input[type=text],textarea{background:var(--card);border:1.5px solid var(--rule);border-radius:10px;padding:.55rem .7rem;min-height:44px;width:100%;max-width:100%}
+textarea{font-family:Literata,Georgia,serif;line-height:1.6;resize:vertical}
+.modes{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.mode{text-align:left;background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:.9rem 1rem;cursor:pointer}
+.mode:hover{border-color:var(--ink)}
+.mode b{display:block;font-size:1.02rem}
+.mode span{font-size:.875rem;color:var(--muted)}
+.mode.lead{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+/* study */
+.progress{display:flex;align-items:center;gap:.75rem;margin:.5rem 0 1.25rem}
+.progress .bar{flex:1}
+.crumbs{font-family:Literata,Georgia,serif;color:var(--muted);font-size:.95rem;margin-bottom:.6rem;display:grid;gap:.15rem}
+.crumbs div{overflow-wrap:anywhere}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:1.3rem 1.2rem;font-family:Literata,Georgia,serif;font-size:1.18rem;line-height:2.05;overflow-wrap:anywhere}
+.mk{font-weight:700;margin-right:.35rem}
+.blank{font-family:Literata,Georgia,serif;font-size:1.05rem;color:var(--hl-ink);background:var(--hl);border:0;border-bottom:2px solid var(--ink);border-radius:3px 3px 0 0;padding:.05rem .3rem;margin:0 .05rem;min-width:3ch;max-width:100%;line-height:1.4;vertical-align:baseline}
+.blank:focus{outline:2px solid var(--accent);outline-offset:1px}
+.blank{transition:background-color .15s ease,color .15s ease}
+.blank.ok{background:var(--good-bg);color:var(--good);border-bottom-color:var(--good);font-weight:600}
+.blank.close{background:var(--close-bg);color:var(--close);border-bottom-color:var(--close);font-weight:600}
+.blank.bad{background:var(--bad-bg);color:var(--bad);border-bottom-color:var(--bad)}
+.blank.shown{text-decoration:line-through;opacity:.8}
+.right{background:var(--good-bg);color:var(--good);border-radius:4px;padding:.05rem .3rem;font-weight:600;margin-left:.2rem}
+.tally{display:flex;gap:.8rem;font-size:.9rem;font-weight:600;flex-wrap:wrap}
+.tally .g{color:var(--good)}.tally .r{color:var(--bad)}.tally .n{color:var(--muted)}
+.ans{border-radius:4px;padding:.05rem .3rem;font-weight:600}
+.ans.ok{background:var(--good-bg);color:var(--good)}
+.ans.close{background:var(--close-bg);color:var(--close)}
+.ans.close small{font-weight:400;font-size:.75em;margin-left:.35rem;text-decoration:line-through;opacity:.8}
+.ans.bad{background:var(--bad-bg);color:var(--bad)}
+.ans.bad s{font-weight:400;opacity:.75}
+.miss{background:var(--bad-bg);color:var(--bad);border-radius:4px;padding:0 .2rem;font-weight:600}
+.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+.actions .btn{flex:1 1 auto}
+.grades{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-top:1rem}
+.grades button{border:1.5px solid var(--rule);background:var(--card);border-radius:10px;padding:.55rem .3rem;cursor:pointer;min-height:56px;font-weight:600;line-height:1.2}
+.grades button small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+.grades button.sug{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.feedback{margin-top:.9rem;font-size:.95rem}
+.kbd{font-size:.8rem;color:var(--muted);margin-top:.75rem}
+/* whole outline */
+.outline{background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:1rem 1.1rem;font-family:Literata,Georgia,serif;font-size:1.08rem;line-height:2}
+.oline{overflow-wrap:anywhere;padding-top:.15rem;padding-bottom:.15rem}
+.oline.d0{font-weight:600;margin-top:.5rem}
+.oline textarea{margin:.25rem 0 .5rem;font-size:1rem}
+.sticky{position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);padding:.6rem 0;z-index:5;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.chip{font:inherit;border:0;border-radius:4px;padding:0 .25rem;cursor:pointer;background:transparent;color:inherit;border-bottom:2px dotted var(--rule)}
+.chip.auto{background:var(--hl);color:var(--hl-ink);border-bottom-color:var(--ink)}
+.chip.always{background:var(--accent);color:var(--accent-ink);border-bottom-color:var(--accent)}
+.chip.never{text-decoration:line-through;color:var(--muted);border-bottom-color:transparent}
+.legend{display:flex;flex-wrap:wrap;gap:.9rem;font-size:.875rem;margin:.5rem 0 1rem}
+.legend span{display:inline-flex;gap:.35rem;align-items:center}
+.sw{display:inline-block;width:1.1rem;height:.8rem;border-radius:3px}
+.empty{background:var(--card);border:1.5px dashed var(--rule);border-radius:14px;padding:1.4rem;margin-top:1.4rem}
+.drop{outline:3px dashed var(--accent);outline-offset:-10px}
+#toast{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(150%);background:var(--ink);color:var(--paper);padding:.7rem 1rem;border-radius:10px;max-width:min(92vw,560px);font-size:.95rem;transition:transform .25s ease;z-index:50}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.loading{opacity:.6;pointer-events:none}
+.danger-zone{margin-top:2.2rem;padding-top:1rem;border-top:1.5px solid var(--rule)}
+@media (max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}.card{font-size:1.1rem;padding:1.1rem 1rem}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="file" multiple hidden>
+<script>
+/* ---------- storage ---------- */
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast("Progress couldn't be saved on this device (storage is full or blocked).");return false}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),4200)}
+
+/* ---------- outline parsing ---------- */
+const STOP=new Set(`a an the and or but nor so yet for of in on at to from by with as into onto about than then that this these those is are was were be am it its it's he she they them their theirs his her hers him we us our ours you your yours i me my mine who whom whose which what when where why how not no do does did done has have had if there here all any each both own same too only over under up down out off again e.g i.e eg ie vs etc isn't aren't wasn't don't doesn't didn't can't won't let's also shall would should could might must being been also`.split(/\s+/));
+const WEAK=new Set(`very many much some every thing things way ways make makes made get gets got like just even well upon within without through therefore thus however because though although among toward towards more most such other others can will may one`.split(' '));
+const ROMAN=/^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+const LOWROM=new Set('i ii iii iv v vi vii viii ix x xi xii xiii xiv xv xvi xvii xviii xix xx'.split(' '));
+function isRomanTok(c){return (c.length<=8&&/^[IVXLCDM]+$/.test(c)&&ROMAN.test(c))||LOWROM.has(c)}
+function romanVal(s){const m={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};s=s.toUpperCase();let v=0;for(let i=0;i<s.length;i++){const a=m[s[i]],b=m[s[i+1]]||0;v+=a<b?-a:a}return v}
+function toRoman(n){const t=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let s='';for(const[v,r]of t)while(n>=v){s+=r;n-=v}return s}
+const MARK=/^(#{1,6}|\d{1,3}(?:\.\d{1,3})+\.?|\(?(?:[IVXLCDM]{1,7}|[ivxlcdm]{1,7}|[A-Za-z]|\d{1,3})[.)]|\((?:[IVXLCDM]{1,7}|[ivxlcdm]{1,7}|[A-Za-z]|\d{1,3})\)|[-*•●◦▪■□‣⁃–—>])\s+/;
+const BULLET=/^[-*•●◦▪■□‣⁃–—>]$/;
+
+function classify(marker,st){
+  if(/^#/.test(marker))return 'h'+marker.length;
+  if(BULLET.test(marker))return 'b';
+  const p=marker.endsWith(')')?'p':'';
+  const k=marker.replace(/[().]/g,'');
+  if(/^\d+(\.\d+)+$/.test(k))return 'dec'+k.split('.').length;
+  if(/^\d+$/.test(k))return p+'num';
+  if(/^[A-Z]+$/.test(k)){
+    const v=ROMAN.test(k)?romanVal(k):0;
+    if(k.length===1){
+      const capNext=st.lastCap?String.fromCharCode(st.lastCap.charCodeAt(0)+1)===k:k==='A';
+      const romNext=v&&v===st.lastRom+1;
+      if(romNext&&!(capNext&&st.lastCap)){st.lastRom=v;st.lastCap='';st.lastLow='';return p+'ROM'}
+      if(capNext||!v){st.lastCap=k;st.lastLow='';return p+'CAP'}
+    }
+    st.lastRom=v;st.lastCap='';st.lastLow='';return p+'ROM';
+  }
+  if(/^[a-z]+$/.test(k)){
+    const v=LOWROM.has(k)?romanVal(k):0;
+    if(k.length===1){
+      const lowNext=st.lastLow?String.fromCharCode(st.lastLow.charCodeAt(0)+1)===k:k==='a';
+      const romNext=v&&v===st.lastLowRom+1;
+      if(romNext&&!(lowNext&&st.lastLow)){st.lastLowRom=v;return p+'rom'}
+      if(lowNext||!v){st.lastLow=k;st.lastLowRom=0;return p+'low'}
+    }
+    st.lastLowRom=v;return p+'rom';
+  }
+  return p+'x';
+}
+function validMarker(marker){
+  if(/^#|^\d/.test(marker)||BULLET.test(marker))return true;
+  const k=marker.replace(/[().]/g,'');
+  if(k.length<=1)return true;
+  return ROMAN.test(k.toUpperCase())&&(k===k.toUpperCase()||LOWROM.has(k));
+}
+function tokenize(text){
+  const toks=[];let emph=false,glueNext=false;
+  text.split(/(\*\*|__)/).forEach(part=>{
+    if(part==='**'||part==='__'){emph=!emph;return}
+    if(!part)return;
+    const startsWs=/^\s/.test(part);
+    const words=part.split(/\s+/);
+    words.forEach((w,wi)=>{
+      if(!w)return;
+      const m=w.match(/^([^\p{L}\p{N}]*)([\s\S]*?)([^\p{L}\p{N}]*)$/u);
+      const glue=wi===0&&!startsWs&&toks.length>0&&glueNext;
+      toks.push({pre:m[1],core:m[2],post:m[3],emph,glue});
+    });
+    glueNext=!/\s$/.test(part);
+  });
+  return toks;
+}
+function parseOutline(raw){
+  const items=[];
+  for(let l of raw.replace(/\r\n?/g,'\n').split('\n')){
+    l=l.replace(/\t/g,'    ').replace(/\u00a0/g,' ');
+    if(!l.trim())continue;
+    const indent=l.match(/^ */)[0].length;
+    let s=l.trim(),marker='';
+    const m=s.match(MARK);
+    if(m&&validMarker(m[1])&&s.length>m[0].length){marker=m[1];s=s.slice(m[0].length).trim()}
+    items.push({indent,marker,text:s});
+  }
+  if(!items.length)return [];
+  // cluster indents
+  const uniq=[...new Set(items.map(i=>i.indent))].sort((a,b)=>a-b);const clusters=[];
+  for(const u of uniq){if(!clusters.length||u-clusters[clusters.length-1]>2)clusters.push(u)}
+  const rank=ind=>{let r=0;clusters.forEach((c,i)=>{if(ind>=c)r=i});return r};
+  const markedFrac=items.filter(i=>i.marker).length/items.length;
+  const merged=[];
+  for(const it of items){
+    const prev=merged[merged.length-1];
+    if(!it.marker&&prev&&markedFrac>0.4&&prev.marker&&!prev.marker.startsWith('#')&&it.indent>prev.indent){prev.text+=' '+it.text;continue}
+    merged.push({...it});
+  }
+  const useIndent=new Set(merged.filter(i=>i.marker).map(i=>rank(i.indent))).size>1;
+  const st={lastRom:0,lastCap:'',lastLow:'',lastLowRom:0};const stack=[];
+  const seen={};const lines=[];
+  merged.forEach(it=>{
+    let type;
+    if(it.marker)type=classify(it.marker,st);else type=markedFrac>0.4?'plain':'plain';
+    let key=type;
+    if(type==='b'||type==='plain'||(useIndent&&!type.startsWith('h')))key=type+':'+rank(it.indent);
+    let d=stack.indexOf(key);
+    if(d===-1){stack.push(key);d=stack.length-1}else stack.length=d+1;
+    const tokens=tokenize(it.text);
+    const plainText=tokens.map(t=>t.pre+t.core+t.post).join(' ');
+    const base=hash(d+'|'+plainText);seen[base]=(seen[base]||0)+1;
+    lines.push({id:base+'-'+seen[base],depth:d,marker:it.marker,type,tokens,text:plainText});
+  });
+  // normalize depths so the smallest is 0
+  const minD=Math.min(...lines.map(l=>l.depth));lines.forEach(l=>l.depth-=minD);
+  lines.forEach((l,i)=>{l.hasChildren=!!(lines[i+1]&&lines[i+1].depth>l.depth);l.idx=i});
+  scoreTokens(lines);
+  return lines;
+}
+function scoreTokens(lines){
+  const freq={};
+  const isBlankable=t=>t.core&&/[\p{L}\p{N}]/u.test(t.core)&&!STOP.has(t.core.toLowerCase())&&!isRomanTok(t.core)&&(t.core.length>1||/\d/.test(t.core));
+  lines.forEach(l=>l.tokens.forEach(t=>{t.blankable=isBlankable(t);if(t.blankable){const k=t.core.toLowerCase();freq[k]=(freq[k]||0)+1}}));
+  lines.forEach(l=>{
+    const first=l.tokens.findIndex(t=>t.core);
+    const colonAt=l.tokens.findIndex((t,i)=>i<7&&/[:–—]/.test(t.post));
+    let inQ=false,prevEnd=true;
+    l.tokens.forEach((t,i)=>{
+      if(/["“]/.test(t.pre))inQ=true;
+      if(t.blankable){
+        const c=t.core,lc=c.toLowerCase();let s=1+Math.min(c.length,12)*0.35;
+        if(t.emph)s+=5;
+        if(/\d/.test(c))s+=3.5;
+        if(/^\p{Lu}/u.test(c)&&i!==first&&!prevEnd)s+=2;
+        if(l.hasChildren||l.depth===0)s+=1;
+        const f=freq[lc];if(f>=2&&f<=8)s+=1.2;else if(f>8)s-=.5;
+        if(/(ology|ism|tion|sion|ment|ness|ity|ance|ence|ive|ical|ic)$/i.test(c))s+=.8;
+        if(colonAt>=0&&i<=colonAt)s+=.8;
+        if(inQ)s+=1;
+        if(WEAK.has(lc))s-=2.2;
+        t.score=+s.toFixed(2);
+      } else t.score=0;
+      if(/["”]/.test(t.post))inQ=false;
+      prevEnd=/[.!?]$/.test(t.post);
+    });
+  });
+}
+
+/* ---------- file import ---------- */
+const LIB={
+  mammoth:'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js',
+  pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfWorker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+};
+const loaded={};
+function loadScript(src){if(loaded[src])return loaded[src];return loaded[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>{delete loaded[src];rej(new Error('The file reader library could not load. Check your connection and try again.'))};document.head.appendChild(s)})}
+function olMarker(depth,n){const style=depth%5;if(style===0)return toRoman(n)+'.';if(style===1)return String.fromCharCode(64+((n-1)%26+1))+'.';if(style===2)return n+'.';if(style===3)return String.fromCharCode(96+((n-1)%26+1))+'.';return toRoman(n).toLowerCase()+'.'}
+function htmlToOutline(html){
+  const d=new DOMParser().parseFromString(html,'text/html');const out=[];
+  const segText=node=>{let s='';node.childNodes.forEach(n=>{
+    if(n.nodeType===3){s+=n.textContent;return}
+    if(n.nodeType!==1)return;const tag=n.tagName;
+    if(tag==='UL'||tag==='OL'||tag==='SCRIPT'||tag==='STYLE')return;
+    if(tag==='BR'){s+=' ';return}
+    const inner=segText(n);
+    if(['STRONG','B','U','EM','I','MARK'].includes(tag)&&inner.trim()){const lead=inner.match(/^\s*/)[0],trail=inner.match(/\s*$/)[0];s+=lead+'**'+inner.trim().replace(/\*\*/g,'')+'**'+trail}
+    else s+=inner;});return s};
+  const walk=(el,depth)=>{for(const n of el.children){const tag=n.tagName;
+    if(/^H[1-6]$/.test(tag)){const t=segText(n).trim();if(t)out.push('#'.repeat(+tag[1])+' '+t)}
+    else if(tag==='UL'||tag==='OL'){let c=0;for(const li of n.children){if(li.tagName!=='LI')continue;c++;const t=segText(li).replace(/\s+/g,' ').trim();if(t)out.push('  '.repeat(depth)+(tag==='OL'?olMarker(depth,c):'•')+' '+t);for(const sub of li.children)if(sub.tagName==='UL'||sub.tagName==='OL')walk({children:[sub]},depth+1)}}
+    else if(tag==='TABLE'){$$('tr',n).forEach(tr=>{const t=[...tr.children].map(td=>segText(td).trim()).filter(Boolean).join(' — ');if(t)out.push(t)})}
+    else if(['DIV','SECTION','ARTICLE','MAIN','BODY','BLOCKQUOTE'].includes(tag)&&n.querySelector('p,li,h1,h2,h3,h4,h5,h6,div'))walk(n,depth);
+    else{const t=segText(n).replace(/\s+/g,' ').trim();if(t)out.push(t)}}};
+  walk(d.body,0);return out.join('\n');
+}
+async function pdfToText(buf){
+  await loadScript(LIB.pdf);
+  const lib=window.pdfjsLib||window['pdfjs-dist/build/pdf'];
+  lib.GlobalWorkerOptions.workerSrc=LIB.pdfWorker;
+  const pdf=await lib.getDocument({data:buf}).promise;const rows=[];let minX=Infinity;
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);const tc=await page.getTextContent();const lines=new Map();
+    for(const it of tc.items){if(!it.str||!it.str.trim())continue;const y=Math.round(it.transform[5]/3);if(!lines.has(y))lines.set(y,[]);lines.get(y).push({x:it.transform[4],s:it.str,w:it.width})}
+    for(const y of [...lines.keys()].sort((a,b)=>b-a)){
+      const L=lines.get(y).sort((a,b)=>a.x-b.x);let s='',end=null;
+      for(const it of L){if(end!==null&&it.x-end>1.5&&!/\s$/.test(s)&&!/^\s/.test(it.s))s+=' ';s+=it.s;end=it.x+it.w}
+      s=s.trim();if(!s||/^(page\s*)?\d+(\s*(of|\/)\s*\d+)?$/i.test(s))continue;
+      rows.push({x:L[0].x,s});minX=Math.min(minX,L[0].x);
+    }
+  }
+  if(!rows.length)throw new Error("This PDF has no selectable text (it may be a scan). Copy the text in and use Paste text instead.");
+  return rows.map(r=>' '.repeat(Math.max(0,Math.round((r.x-minX)/6)))+r.s).join('\n');
+}
+function rtfToText(s){return s.replace(/\\par[d]?/g,'\n').replace(/\\tab/g,'    ').replace(/\{\\\*[^{}]*\}/g,'').replace(/\\'[0-9a-f]{2}/gi,'').replace(/\\[a-z]+-?\d* ?/gi,'').replace(/[{}]/g,'')}
+async function fileToText(f){
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='docx'){await loadScript(LIB.mammoth);const r=await window.mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()});return htmlToOutline(r.value)}
+  if(ext==='pdf')return pdfToText(await f.arrayBuffer());
+  if(ext==='html'||ext==='htm')return htmlToOutline(await f.text());
+  if(ext==='rtf')return rtfToText(await f.text());
+  if(['doc','ppt','pptx','key','pages','xls','xlsx','numbers','png','jpg','jpeg','heic','gif','webp','zip'].includes(ext))
+    throw new Error(`.${ext} files can't be read here. Save it as Word (.docx), PDF or text, or copy the outline and use Paste text.`);
+  const t=await f.text();
+  if(/\u0000/.test(t.slice(0,4000)))throw new Error("This doesn't look like a text file. Save it as Word (.docx), PDF or text, or paste the outline.");
+  return t;
+}
+
+/* ---------- spaced repetition ---------- */
+const MIN=60e3,DAY=864e5;
+function capDays(){const ex=S.cur&&S.cur.set.exam;if(!ex)return 60;const left=(new Date(ex+'T09:00').getTime()-Date.now())/DAY;return Math.max(1,Math.floor(left/2))}
+function schedule(prev,g){
+  const c=Object.assign({ease:2.5,ivl:0,reps:0,lapses:0},prev||{});const now=Date.now();
+  if(g===0){c.reps=0;c.lapses++;c.ease=Math.max(1.3,c.ease-.2);c.ivl=0;c.due=now+MIN}
+  else if(c.reps===0){if(g===1)c.due=now+6*MIN;else if(g===2){c.reps=1;c.due=now+10*MIN}else{c.reps=2;c.ivl=1;c.ease+=.15;c.due=now+DAY}}
+  else if(c.reps===1){if(g===1)c.due=now+10*MIN;else{c.reps=2;c.ivl=g===3?2:1;if(g===3)c.ease+=.15;c.ivl=Math.min(c.ivl,capDays());c.due=now+c.ivl*DAY}}
+  else{let iv=g===1?c.ivl*1.2:g===2?c.ivl*c.ease:c.ivl*c.ease*1.3;if(g===1)c.ease=Math.max(1.3,c.ease-.15);if(g===3)c.ease+=.15;iv=Math.min(Math.max(1,iv),capDays());c.ivl=+iv.toFixed(2);c.reps++;c.due=now+iv*DAY}
+  c.last=now;return c;
+}
+function fmtIvl(ms){const m=Math.round(ms/MIN);if(m<60)return m+' min';const h=Math.round(m/60);if(h<24)return h+' hr';const d=Math.round(ms/DAY);return d+(d===1?' day':' days')}
+
+/* ---------- app state ---------- */
+const LEVELS=[['easy','Easy','One key word per line'],['medium','Medium','About a third of the key words'],['hard','Hard','About two-thirds of the key words'],['all','Every word','Every testable word is blank'],['recite','Recite','Type each whole line from memory']];
+const S={view:'library',decks:store.get('od.decks',[]),g:store.get('od.global',{strict:false}),cur:null,sess:null,whole:null,editing:false};
+function saveDecks(){store.set('od.decks',S.decks)}
+function saveSrs(){store.set('od.srs.'+S.cur.meta.id,S.cur.srs)}
+function saveOvr(){store.set('od.ovr.'+S.cur.meta.id,S.cur.ovr)}
+function saveSet(){store.set('od.set.'+S.cur.meta.id,S.cur.set)}
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function addDeck(name,src){
+  const lines=parseOutline(src);if(!lines.length)throw new Error('No outline text was found.');
+  const id=newId();S.decks.unshift({id,name,created:Date.now()});
+  if(!store.set('od.src.'+id,src)){S.decks.shift();throw new Error('Not enough storage space.')}
+  saveDecks();return id;
+}
+function loadDeck(id){
+  const meta=S.decks.find(d=>d.id===id);if(!meta)return null;
+  const src=store.get('od.src.'+id,'');const lines=parseOutline(src);
+  const cur={meta,src,lines,byId:Object.fromEntries(lines.map(l=>[l.id,l])),srs:store.get('od.srs.'+id,{}),ovr:store.get('od.ovr.'+id,{}),set:Object.assign({level:'medium',section:'all',exam:'',newPer:25},store.get('od.set.'+id,{}))};
+  return cur;
+}
+function openDeck(id){S.cur=loadDeck(id);if(!S.cur){S.view='library';return render()}S.view='deck';render()}
+function ovrKey(line,i){return line.id+':'+i}
+function blanksFor(line,level,cur=S.cur){
+  if(level==='recite')return new Set();
+  const cand=[],forced=[];
+  line.tokens.forEach((t,i)=>{const o=cur.ovr[ovrKey(line,i)];if(o==='never')return;if(o==='always')forced.push(i);else if(t.blankable)cand.push(i)});
+  cand.sort((a,b)=>line.tokens[b].score-line.tokens[a].score||a-b);
+  const n=cand.length+forced.length;if(!n)return new Set();
+  let want=level==='easy'?(n>12?2:1):level==='medium'?Math.max(1,Math.round(n*.35)):level==='hard'?Math.max(1,Math.round(n*.65)):n;
+  want=Math.max(0,want-forced.length);
+  return new Set([...forced,...cand.slice(0,want)]);
+}
+function sectionList(cur=S.cur){let d=0,tops=cur.lines.filter(l=>l.depth===0);if(tops.length<2){d=1;const t1=cur.lines.filter(l=>l.depth===1);if(t1.length>=2)tops=t1;else d=0}return tops}
+function scopeLines(cur=S.cur){
+  const sec=cur.set.section;if(sec==='all')return cur.lines;
+  const start=cur.lines.findIndex(l=>l.id===sec);if(start<0)return cur.lines;
+  const d=cur.lines[start].depth;const out=[cur.lines[start]];
+  for(let i=start+1;i<cur.lines.length&&cur.lines[i].depth>d;i++)out.push(cur.lines[i]);return out;
+}
+function isCard(l,cur=S.cur){return cur.set.level==='recite'?l.tokens.some(t=>t.core):blanksFor(l,cur.set.level,cur).size>0}
+function scopeCards(cur=S.cur){return scopeLines(cur).filter(l=>isCard(l,cur))}
+function deckStats(cur){
+  const now=Date.now();const cards=scopeCards(cur);let nw=0,due=0,known=0,learn=0;
+  cards.forEach(l=>{const c=cur.srs[l.id];if(!c)nw++;else if(c.due<=now)due++;else if(c.reps>=2&&c.ivl>=1)known++;else learn++});
+  return {total:cards.length,nw,due,known,learn};
+}
+function ancestors(line){const out=[];let d=line.depth;for(let i=line.idx-1;i>=0&&d>0;i--){const l=S.cur.lines[i];if(l.depth<d){out.unshift(l);d=l.depth}}return out}
+function showMarker(l){if(!l.marker||l.marker.startsWith('#'))return '';return `<span class="mk">${esc(BULLET.test(l.marker)?'•':l.marker)}</span>`}
+function plainLine(l){return esc(l.tokens.map((t,i)=>(i&&!t.glue?' ':'')+t.pre+t.core+t.post).join(''))}
+
+/* ---------- checking ---------- */
+function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’‘]/g,"'").replace(/[^\p{L}\p{N}]/gu,'')}
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+function judge(ans,core){const a=norm(ans),b=norm(core);if(!a)return 'bad';if(a===b)return 'ok';if(!S.g.strict){const d=lev(a,b);if((b.length>=4&&d<=1)||(b.length>=8&&d<=2))return 'close'}return 'bad'}
+function suggest(acc,hinted){if(acc>=1&&!hinted)return 2;if(acc>=.75)return 1;return 0}
+function checkBlanks(line,inputs,hints){
+  const res={};let pts=0,n=0;
+  inputs.forEach(inp=>{const i=+inp.dataset.i;const r=judge(inp.value,line.tokens[i].core);const h=hints&&hints.has(i);res[i]={v:inp.value.trim(),r,h};n++;pts+=r==='ok'?(h?.5:1):r==='close'?.5:0});
+  return {res,acc:n?pts/n:1};
+}
+function reciteCheck(line,typed){
+  const E=[];line.tokens.forEach((t,i)=>{const k=norm(t.core);if(k)E.push({k,i})});
+  const G=typed.split(/\s+/).map(norm).filter(Boolean);
+  const eq=(a,b)=>a===b||(!S.g.strict&&a.length>=4&&lev(a,b)<=1);
+  const n=E.length,m=G.length;const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=eq(E[i].k,G[j])?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const hit=new Set();let i=0,j=0;while(i<n&&j<m){if(eq(E[i].k,G[j])){hit.add(E[i].i);i++;j++}else if(dp[i+1][j]>=dp[i][j+1])i++;else j++}
+  const acc=n?hit.size/n:1;
+  const html=line.tokens.map((t,k)=>{const sp=k&&!t.glue?' ':'';const w=esc(t.pre+t.core+t.post);return sp+(norm(t.core)&&!hit.has(k)?`<span class="miss">${w}</span>`:w)}).join('');
+  return {acc,html};
+}
+function lineHTML(line,blanks,res,lineAttr){
+  return line.tokens.map((t,i)=>{
+    const sp=i&&!t.glue?' ':'';
+    if(!blanks.has(i))return sp+esc(t.pre+t.core+t.post);
+    const r=res&&res[i];
+    if(!r)return sp+esc(t.pre)+`<input class="blank" data-i="${i}"${lineAttr?` data-l="${lineAttr}"`:''} style="width:${Math.max(3,t.core.length)+1.4}ch" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" aria-label="Missing word">`+esc(t.post);
+    let span;
+    if(r.r==='ok')span=`<span class="ans ok">${esc(t.core)}</span>`;
+    else if(r.r==='fixed')span=`<span class="ans ok" title="Right on a second try">${esc(t.core)}<small style="font-weight:400;font-size:.7em;margin-left:.3rem">2nd try</small></span>`;
+    else if(r.r==='close')span=`<span class="ans close">${esc(t.core)}<small>${esc(r.v)}</small></span>`;
+    else span=`<span class="ans bad">${r.v?`<s>${esc(r.v)}</s> `:''}${esc(t.core)}</span>`;
+    return sp+esc(t.pre)+span+esc(t.post);
+  }).join('');
+}
+
+/* ---------- views ---------- */
+function header(){
+  let right='';
+  if(S.view==='deck')right=`<button class="btn ghost" data-act="home">All outlines</button>`;
+  else if(['study','whole','tune','done','edit'].includes(S.view))right=`<button class="btn ghost" data-act="back">${S.view==='study'?'End session':'Back'}</button>`;
+  return `<header class="top"><div class="brand"><span class="mark" aria-hidden="true"></span>Outline Drill</div>${right}</header>`;
+}
+const V={};
+V.library=()=>{
+  const rows=S.decks.map(d=>{const c=loadDeck(d.id);const st=c?deckStats(c):{total:0,due:0,nw:0,known:0};
+    return `<li><button class="deck" data-act="open" data-arg="${d.id}"><span><b>${esc(d.name)}</b><span class="muted small">${st.total} lines to learn, ${st.known} known</span></span>${st.due?`<span class="pill">${st.due} due</span>`:''}</button></li>`}).join('');
+  return `<main class="wrap">
+  <h1>Learn your outlines word for word.</h1>
+  <p class="muted">Import an outline and the words most likely to be tested get blanked out. Lines you miss come back sooner; lines you know wait longer.</p>
+  <div class="row" style="margin-top:1.1rem"><button class="btn primary" data-act="pick">Import files</button><button class="btn" data-act="paste">Paste text</button>${S.decks.length?'':`<button class="btn ghost" data-act="sample">Try a sample</button>`}</div>
+  <p class="muted small" style="margin-top:.6rem">Reads Word (.docx), PDF, text, Markdown, RTF and HTML files. You can pick several at once or drop them on this page.</p>
+  ${S.decks.length?`<h2>Your outlines</h2><ul class="decks">${rows}</ul>`:`<div class="empty"><p><b>No outlines yet.</b></p><p class="muted">Import your class outline to start. Keep the numbering (I., A., 1., a.) in the file so each point is recognized.</p></div>`}
+  </main>`;
+};
+V.paste=()=>`<main class="wrap"><h1>Paste an outline</h1>
+  <div class="field"><label for="pname">Name</label><input type="text" id="pname" placeholder="e.g. Midterm outline, Chapter 3"></div>
+  <div class="field"><label for="ptext">Outline text</label><textarea id="ptext" rows="14" placeholder="I. First main point&#10;   A. Sub-point&#10;      1. Detail"></textarea></div>
+  <div class="row"><button class="btn primary" data-act="savePaste">Save outline</button><button class="btn ghost" data-act="home">Cancel</button></div></main>`;
+V.deck=()=>{
+  const c=S.cur,st=deckStats(c),secs=sectionList();
+  const pct=v=>st.total?(v/st.total*100):0;
+  let examNote='';if(c.set.exam){const d=Math.ceil((new Date(c.set.exam+'T09:00')-Date.now())/DAY);examNote=d>0?`${d} day${d===1?'':'s'} to go. Reviews are spaced to fit before then.`:d===0?'Exam day. Good luck.':'This date has passed.'}
+  return `<main class="wrap">
+  ${S.editing?`<div class="row" style="margin-top:1rem"><input type="text" id="rname" value="${esc(c.meta.name)}" style="flex:1;min-width:0"><button class="btn primary" data-act="saveName">Save</button></div>`:`<h1>${esc(c.meta.name)}</h1>`}
+  <div class="stats">
+    <div class="stat"><b>${st.due}</b><span>Due now</span></div>
+    <div class="stat"><b>${st.nw}</b><span>Not started</span></div>
+    <div class="stat"><b>${st.learn}</b><span>Learning</span></div>
+    <div class="stat"><b>${st.known}</b><span>Known</span></div>
+  </div>
+  <div class="bar" aria-label="Progress"><i style="width:${pct(st.known)}%;background:var(--good)"></i><i style="width:${pct(st.learn+st.due)}%;background:var(--hl)"></i></div>
+  <div class="field"><span class="flabel">Blanks</span><div class="seg" role="group" aria-label="Blank level">${LEVELS.map(([k,n])=>`<button data-act="level" data-arg="${k}" aria-pressed="${c.set.level===k}">${n}</button>`).join('')}</div>
+  <p class="muted small" style="margin-top:.4rem">${LEVELS.find(l=>l[0]===c.set.level)[2]}.</p></div>
+  ${secs.length>1?`<div class="field"><label for="sec">Section</label><select id="sec"><option value="all">Whole outline</option>${secs.map(s=>`<option value="${s.id}" ${c.set.section===s.id?'selected':''}>${esc((s.marker&&!s.marker.startsWith('#')?s.marker+' ':'')+s.text).slice(0,80)}</option>`).join('')}</select></div>`:''}
+  <div class="field"><label for="exam">Exam date</label><input type="date" id="exam" value="${esc(c.set.exam)}" style="max-width:220px"><p class="muted small">${examNote||'Optional. Keeps review gaps short enough to reach every line before the exam.'}</p></div>
+  <h2>Study</h2>
+  <div class="modes">
+    <button class="mode lead" data-act="start" data-arg="review"><b>Review due</b><span>${st.due} due plus up to ${Math.min(st.nw,c.set.newPer)} new lines, spaced by how well you know them</span></button>
+    <button class="mode" data-act="start" data-arg="order"><b>Straight through</b><span>Every line in outline order, one at a time</span></button>
+    <button class="mode" data-act="start" data-arg="whole"><b>Whole outline</b><span>All blanks on one page, like the exam</span></button>
+    <button class="mode" data-act="start" data-arg="weak"><b>Weak spots</b><span>Lines you've missed most often</span></button>
+  </div>
+  <h2>Adjust</h2>
+  <div class="row"><button class="btn" data-act="tune">Choose blank words</button><button class="btn" data-act="edit">Edit outline text</button><button class="btn" data-act="rename">Rename</button>
+  <button class="btn" data-act="strict" aria-pressed="${S.g.strict}">Spelling: ${S.g.strict?'exact':'allow small typos'}</button></div>
+  <div class="danger-zone row"><button class="btn danger" data-act="reset">Reset progress</button><button class="btn danger" data-act="del">Delete outline</button></div>
+  </main>`;
+};
+V.study=()=>{
+  const s=S.sess,l=s.line,rec=S.cur.set.level==='recite';
+  const left=s.queue.length+s.learn.length;const done=s.done;const tot=done+left+1;
+  const crumbs=ancestors(l).map(a=>`<div>${showMarker(a)}${plainLine(a)}</div>`).join('');
+  let body;
+  if(rec)body=s.checked?`<div>${showMarker(l)}${s.recHTML}</div>`:`<div>${showMarker(l)}<span class="muted">Type this line</span></div><textarea id="recite" rows="3" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type the whole line from memory" style="margin-top:.5rem"></textarea>`;
+  else body=`${showMarker(l)}${lineHTML(l,s.blanks,s.checked?s.res:null)}`;
+  let actions;
+  if(!s.checked)actions=rec?`<div class="actions"><button class="btn" data-act="reveal">Show answer</button><button class="btn primary" data-act="check">Check</button></div>`
+    :`<div class="actions"><button class="btn" data-act="hint">Hint</button><button class="btn" data-act="checkAnswered">Check answered</button><button class="btn" data-act="reveal">Show all answers</button></div>`;
+  else{const names=['Again','Hard','Good','Easy'];actions=`<div class="feedback">${Math.round(s.acc*100)}% correct${s.hints.size?' (with hints)':''}. How well did you know it?</div><div class="grades">${names.map((n,g)=>{const c=schedule(S.cur.srs[l.id],g);return `<button data-act="grade" data-arg="${g}" class="${g===s.sug?'sug':''}">${n}<small>${fmtIvl(c.due-Date.now())}</small></button>`}).join('')}</div>`}
+  return `<main class="wrap">
+  <div class="progress"><div class="bar"><i style="width:${done/tot*100}%;background:var(--accent)"></i></div><span class="small muted">${left+1} left</span></div>
+  ${crumbs?`<div class="crumbs">${crumbs}</div>`:''}
+  <div class="card" style="padding-left:calc(1.2rem + ${Math.min(ancestors(l).length,3)*.4}rem)">${body}</div>
+  ${actions}
+  <p class="kbd">${rec?'Press Enter to check the line.':'Each blank turns green or red as soon as you answer it (press Enter or move to the next blank). A red blank can be retyped. The line finishes once every blank is answered.'} After that, press 1 to 4 to rate, or Enter for the highlighted rating.</p>
+  </main>`;
+};
+V.done=()=>{const s=S.sess;const avg=s.done?Math.round(s.score/s.done*100):0;const st=deckStats(S.cur);
+  return `<main class="wrap"><h1>Session done.</h1><p>You worked through ${s.done} line${s.done===1?'':'s'} at ${avg}% average accuracy.</p><p class="muted">${st.due?`${st.due} more line${st.due===1?' is':'s are'} due now.`:`${st.known} of ${st.total} lines are known.`}</p>
+  <div class="row" style="margin-top:1rem">${st.due||st.nw?`<button class="btn primary" data-act="start" data-arg="review">Keep reviewing</button>`:''}<button class="btn" data-act="back">Back to outline</button></div></main>`};
+V.whole=()=>{
+  const w=S.whole,lvl=S.cur.set.level,rec=lvl==='recite';
+  const lines=scopeLines().map(l=>{
+    const pad=`style="padding-left:${Math.min(l.depth,6)*1.2}rem"`;
+    if(rec){if(!l.tokens.some(t=>t.core))return '';return `<div class="oline d${l.depth}" ${pad}>${showMarker(l)}${w.checked?(w.rec[l.id]||plainLine(l)):`<textarea class="rec" data-l="${l.id}" rows="2" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type this line"></textarea>`}</div>`}
+    return `<div class="oline d${l.depth}" ${pad}>${showMarker(l)}${lineHTML(l,blanksFor(l,lvl),w.checked?w.res[l.id]||{}:null,l.id)}</div>`;
+  }).join('');
+  return `<main class="wrap"><h1 style="font-size:1.5rem">${esc(S.cur.meta.name)}</h1>
+  <div class="sticky">${w.checked?`<b>${Math.round(w.acc*100)}% correct</b><button class="btn primary" data-act="wholeAgain">Start over</button>`
+   :rec?`<button class="btn primary" data-act="wholeCheck">Check all</button><span class="muted small">Type each line, then check.</span>`
+   :`<div class="tally" id="tally"></div><button class="btn" data-act="wholeAnswered">Check answered</button><button class="btn" data-act="wholeCheck">Show all answers</button><button class="btn ghost" data-act="wholeAgain">Start over</button>`}</div>
+  <div class="outline">${lines}</div>
+  ${w.checked?'':rec?`<div class="actions"><button class="btn primary" data-act="wholeCheck">Check all</button></div>`:`<div class="actions"><button class="btn" data-act="wholeAnswered">Check answered</button><button class="btn" data-act="wholeCheck">Show all answers</button></div>`}</main>`;
+};
+V.tune=()=>{
+  const lvl=S.cur.set.level==='recite'?'medium':S.cur.set.level;
+  const lines=scopeLines().map(l=>{const b=blanksFor(l,lvl);
+    const html=l.tokens.map((t,i)=>{const sp=i&&!t.glue?' ':'';const o=S.cur.ovr[ovrKey(l,i)];
+      if(!t.blankable&&!o)return sp+esc(t.pre+t.core+t.post);
+      const cls=o==='always'?'always':o==='never'?'never':b.has(i)?'auto':'';
+      return sp+esc(t.pre)+`<button class="chip ${cls}" data-act="chip" data-arg="${l.id}|${i}">${esc(t.core)}</button>`+esc(t.post)}).join('');
+    return `<div class="oline d${l.depth}" style="padding-left:${Math.min(l.depth,6)*1.2}rem">${showMarker(l)}${html}</div>`}).join('');
+  return `<main class="wrap"><h1 style="font-size:1.5rem">Choose blank words</h1>
+  <p class="muted">Tap a word to cycle it: always blank, never blank, then back to automatic. Your choices apply at every level. Showing the ${LEVELS.find(x=>x[0]===lvl)[1].toLowerCase()} level.</p>
+  <div class="legend"><span><i class="sw" style="background:var(--hl)"></i>Blank at this level</span><span><i class="sw" style="background:var(--accent)"></i>Always blank</span><span><i class="sw" style="border:1.5px dotted var(--muted)"></i>Can be blanked</span><span><s class="muted">word</s> Never blank</span></div>
+  <div class="outline">${lines}</div></main>`;
+};
+V.edit=()=>`<main class="wrap"><h1 style="font-size:1.5rem">Edit outline text</h1><p class="muted">Fix any lines that were read wrong. Progress is kept for lines you don't change. Wrap a word in **double asterisks** to mark it as a key term.</p>
+  <div class="field"><textarea id="etext" rows="20">${esc(S.cur.src)}</textarea></div>
+  <div class="row"><button class="btn primary" data-act="saveEdit">Save changes</button><button class="btn ghost" data-act="back">Cancel</button></div></main>`;
+
+function render(){
+  const app=$('#app');app.innerHTML=header()+(V[S.view]||V.library)();
+  if(S.view==='whole')updateTally();
+  if(S.view==='study'){const f=$('.blank')||$('#recite');if(f&&!S.sess.checked)setTimeout(()=>f.focus({preventScroll:false}),30)}
+}
+
+/* ---------- actions ---------- */
+let armed=null;
+function twoTap(btn,key,label,fn){if(armed===key){armed=null;fn()}else{armed=key;const old=btn.textContent;btn.textContent=label;setTimeout(()=>{if(armed===key){armed=null;btn.textContent=old}},3500)}}
+const ACT={
+  home(){S.view='library';S.cur=null;S.editing=false;render();window.scrollTo(0,0)},
+  back(){if(S.view==='done'||S.view==='study'||S.view==='whole'||S.view==='tune'||S.view==='edit'){S.view='deck';render();window.scrollTo(0,0)}else ACT.home()},
+  pick(){$('#file').value='';$('#file').click()},
+  paste(){S.view='paste';render();$('#ptext').focus()},
+  sample(){const id=addDeck('Sample: American Revolution',SAMPLE);openDeck(id)},
+  savePaste(){const t=$('#ptext').value;if(!t.trim()){toast('Paste your outline text first.');return}
+    try{const id=addDeck($('#pname').value.trim()||'Pasted outline',t);openDeck(id)}catch(e){toast(e.message)}},
+  open(id){openDeck(id);window.scrollTo(0,0)},
+  level(k){S.cur.set.level=k;saveSet();render()},
+  strict(){S.g.strict=!S.g.strict;store.set('od.global',S.g);render()},
+  rename(){S.editing=true;render();$('#rname').focus()},
+  saveName(){const v=$('#rname').value.trim();if(v){S.cur.meta.name=v;saveDecks()}S.editing=false;render()},
+  reset(_,b){twoTap(b,'reset','Tap again to reset',()=>{S.cur.srs={};saveSrs();toast('Progress reset.');render()})},
+  del(_,b){twoTap(b,'del','Tap again to delete',()=>{const id=S.cur.meta.id;['src','srs','ovr','set'].forEach(k=>store.del('od.'+k+'.'+id));S.decks=S.decks.filter(d=>d.id!==id);saveDecks();toast('Outline deleted.');ACT.home()})},
+  tune(){S.view='tune';render();window.scrollTo(0,0)},
+  edit(){S.view='edit';render()},
+  saveEdit(){const t=$('#etext').value;if(!parseOutline(t).length){toast('The outline is empty.');return}
+    store.set('od.src.'+S.cur.meta.id,t);S.cur=loadDeck(S.cur.meta.id);S.view='deck';toast('Outline saved.');render()},
+  chip(arg){const [id,i]=arg.split('|');const k=id+':'+i;const o=S.cur.ovr[k];
+    if(!o)S.cur.ovr[k]='always';else if(o==='always')S.cur.ovr[k]='never';else delete S.cur.ovr[k];saveOvr();const y=window.scrollY;render();window.scrollTo(0,y)},
+  start(mode){startSession(mode)},
+  hint(){const s=S.sess;const lf=hintTarget||lastFocus;hintTarget=null;const inp=(lf&&document.body.contains(lf)&&!lf.readOnly)?lf:$$('.blank').find(x=>norm(x.value)!==norm(s.line.tokens[+x.dataset.i].core))||$('.blank');
+    if(!inp)return;const core=s.line.tokens[+inp.dataset.i].core;const have=inp.value.trim();let n=0;while(n<have.length&&n<core.length&&have[n].toLowerCase()===core[n].toLowerCase())n++;
+    inp.classList.remove('bad');inp.removeAttribute('data-state');inp.value=core.slice(0,Math.min(core.length,n+1));s.hints.add(+inp.dataset.i);inp.focus();commitBlank(inp,false)},
+  reveal(){if(S.cur.set.level==='recite')doCheck(true);else{commitAll(true);finishCard(true)}},
+  check(){doCheck(false)},
+  checkAnswered(){commitAll(false);if(S.view==='study'&&!S.sess.checked)revealWrong()},
+  wholeAnswered(){commitAll(false);revealWrong();updateTally()},
+  grade(g){gradeCard(+g)},
+  wholeCheck(){wholeCheck()},
+  wholeAgain(){S.whole={checked:false,res:{},rec:{},graded:new Set()};render();window.scrollTo(0,0)}
+};
+let lastFocus=null,hintTarget=null;
+document.addEventListener('focusin',e=>{const t=e.target;if(!(t.classList&&t.classList.contains('blank')))return;
+  if(lastFocus&&lastFocus!==t&&document.body.contains(lastFocus))commitBlank(lastFocus,true);
+  if(document.body.contains(t))lastFocus=t});
+document.addEventListener('input',e=>{const t=e.target;if(!(t.classList&&t.classList.contains('blank')))return;
+  if(t.classList.contains('bad')){t.classList.remove('bad');t.removeAttribute('data-state')}
+  commitBlank(t,false)});
+
+/* ---------- instant feedback ---------- */
+function lineOfInput(inp){return S.view==='study'?S.sess.line:S.cur.byId[inp.dataset.l]}
+function setVerdict(inp,r){
+  inp.classList.remove('ok','close','bad');inp.classList.add(r);inp.dataset.state=r;
+  if(!inp.dataset.first)inp.dataset.first=r;
+  if(r!=='bad'){inp.readOnly=true;inp.setAttribute('aria-label',r==='ok'?'Correct':'Correct but misspelled')}
+  else inp.setAttribute('aria-label','Incorrect, type again');
+}
+function commitBlank(inp,final){
+  if(!inp||inp.readOnly||!document.body.contains(inp))return;
+  const line=lineOfInput(inp);if(!line)return;
+  const core=line.tokens[+inp.dataset.i].core;const v=inp.value.trim();
+  if(!v)return;
+  const r=judge(v,core);
+  if(r==='ok')setVerdict(inp,'ok');
+  else if(final){if(inp.dataset.state==='bad')return;setVerdict(inp,r)}
+  else return;
+  afterVerdict(inp,r==='ok'&&!final);
+}
+function focusNext(inp){
+  const all=$$('.blank');const open=x=>!x.readOnly&&!x.value.trim();
+  const n=all.slice(all.indexOf(inp)+1).find(open)||all.find(open);
+  if(n){n.focus();return true}return false;
+}
+function afterVerdict(inp,advance){
+  if(S.view==='study'){
+    const all=$$('.blank');
+    if(all.every(x=>x.dataset.state)){finishCard(false);return}
+    if(advance)focusNext(inp);
+  }else if(S.view==='whole'){
+    gradeLineIfDone(inp.dataset.l);updateTally();
+    if(advance)focusNext(inp);
+  }
+}
+function commitAll(final){$$('.blank').forEach(i=>{if(!document.body.contains(i))return;if(i.value.trim()&&!i.dataset.state)commitBlank(i,final||true)})}
+function revealWrong(){
+  $$('.blank.bad:not(.shown)').forEach(i=>{const l=lineOfInput(i);i.readOnly=true;i.classList.add('shown');i.setAttribute('aria-label','Incorrect');
+    const sp=document.createElement('span');sp.className='right';sp.textContent=l.tokens[+i.dataset.i].core;i.after(sp)});
+  if(S.view==='study'&&!S.sess.checked&&$$('.blank').every(x=>x.dataset.state))finishCard(false);
+  if(S.view==='whole')$$('.blank.bad').forEach(i=>gradeLineIfDone(i.dataset.l));
+}
+function blankCredit(inp,hinted){const f=inp.dataset.first;return f==='ok'?(hinted?.5:1):f==='close'?.5:0}
+function blankRes(inp){const st=inp.dataset.state;const cur=st==='ok'||st==='close'?st:'bad';return {v:inp.value.trim(),r:cur==='ok'&&inp.dataset.first==='bad'?'fixed':cur}}
+function finishCard(reveal){
+  const s=S.sess;if(s.checked)return;const inputs=$$('.blank');const res={};let pts=0;
+  inputs.forEach(inp=>{const i=+inp.dataset.i;res[i]=blankRes(inp);pts+=blankCredit(inp,s.hints.has(i))});
+  s.res=res;s.acc=inputs.length?pts/inputs.length:1;
+  const anyWrongFirst=inputs.some(x=>x.dataset.first!=='ok');
+  s.sug=reveal&&inputs.some(x=>!x.dataset.state)?0:suggest(s.acc,s.hints.size>0||anyWrongFirst&&s.acc<1);
+  s.checked=true;render();const b=$('.grades .sug');if(b)b.focus({preventScroll:true});
+}
+function gradeLineIfDone(id){
+  const w=S.whole;if(!w||w.graded.has(id))return;
+  const ins=$$('.blank').filter(x=>x.dataset.l===id);if(!ins.length||!ins.every(x=>x.dataset.state))return;
+  const acc=ins.reduce((a,x)=>a+blankCredit(x,false),0)/ins.length;
+  S.cur.srs[id]=schedule(S.cur.srs[id],suggest(acc,false));w.graded.add(id);saveSrs();
+}
+function updateTally(){const el=$('#tally');if(!el)return;const all=$$('.blank');
+  const g=all.filter(x=>x.dataset.state==='ok'||x.dataset.state==='close').length,r=all.filter(x=>x.dataset.state==='bad').length;
+  el.innerHTML=`<span class="g">${g} right</span><span class="r">${r} wrong</span><span class="n">${all.length-g-r} left</span>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='hint'&&lastFocus)hintTarget=lastFocus;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b.dataset.arg,b,e)}});
+document.addEventListener('change',e=>{
+  if(e.target.id==='sec'){S.cur.set.section=e.target.value;saveSet();render()}
+  if(e.target.id==='exam'){S.cur.set.exam=e.target.value;saveSet();render()}
+  if(e.target.id==='file')importFiles([...e.target.files]);
+});
+document.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(S.view==='study'){
+    const s=S.sess;
+    if(!s.checked){
+      if(e.key==='Enter'&&t.classList&&t.classList.contains('blank')){e.preventDefault();commitBlank(t,true);if(!S.sess.checked&&document.body.contains(t)&&t.dataset.state!=='bad')focusNext(t)}
+      else if(e.key==='Enter'&&t.id==='recite'&&!e.shiftKey){e.preventDefault();doCheck(false)}
+    }else if(['1','2','3','4'].includes(e.key)){e.preventDefault();gradeCard(+e.key-1)}
+    else if(e.key==='Enter'){e.preventDefault();gradeCard(s.sug)}
+  }else if(S.view==='whole'&&e.key==='Enter'&&t.classList&&t.classList.contains('blank')){
+    e.preventDefault();commitBlank(t,true);if(t.dataset.state!=='bad')focusNext(t);
+  }else if(e.key==='Enter'&&t.id==='rname'){ACT.saveName()}
+});
+// drag & drop
+['dragover','dragenter'].forEach(ev=>document.addEventListener(ev,e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')){e.preventDefault();document.body.classList.add('drop')}}));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{if(ev==='dragleave'&&e.relatedTarget)return;document.body.classList.remove('drop')}));
+document.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length){e.preventDefault();importFiles([...e.dataTransfer.files])}});
+
+async function importFiles(files){
+  if(!files.length)return;const app=$('#app');app.classList.add('loading');toast(`Reading ${files.length===1?files[0].name:files.length+' files'}…`);
+  let last=null,ok=0;
+  for(const f of files){try{const text=await fileToText(f);last=addDeck(f.name.replace(/\.[^.]+$/,''),text);ok++}catch(e){toast(`${f.name}: ${e.message||'could not be read.'}`);await new Promise(r=>setTimeout(r,2500))}}
+  app.classList.remove('loading');
+  if(ok===1)openDeck(last);else if(ok>1){S.view='library';render();toast(`Imported ${ok} outlines.`)}
+}
+
+/* ---------- sessions ---------- */
+function startSession(mode){
+  const cards=scopeCards();const now=Date.now();const srs=S.cur.srs;let q=[];
+  if(!cards.length){toast('No lines with blanks here. Try another level or section.');return}
+  if(mode==='whole'){S.whole={checked:false,res:{},rec:{},graded:new Set()};S.view='whole';render();window.scrollTo(0,0);return}
+  if(mode==='review'){
+    const due=cards.filter(l=>srs[l.id]&&srs[l.id].due<=now).sort((a,b)=>srs[a.id].due-srs[b.id].due);
+    const fresh=cards.filter(l=>!srs[l.id]).slice(0,S.cur.set.newPer);q=[...due,...fresh];
+    if(!q.length){const nxt=Math.min(...cards.map(l=>srs[l.id].due));toast(`Nothing due. Next review in ${fmtIvl(nxt-now)}. Try Straight through or Whole outline meanwhile.`);return}
+  }else if(mode==='order')q=cards.slice();
+  else if(mode==='weak'){q=cards.filter(l=>srs[l.id]&&(srs[l.id].lapses>0||srs[l.id].ease<2.4)).sort((a,b)=>srs[b.id].lapses-srs[a.id].lapses||srs[a.id].ease-srs[b.id].ease).slice(0,30);
+    if(!q.length){toast("No missed lines yet. Study a few first.");return}}
+  S.sess={mode,queue:q.map(l=>l.id),learn:[],done:0,score:0};nextCard();
+}
+function nextCard(){
+  const s=S.sess,now=Date.now();let id=null;s.learn.sort((a,b)=>a.due-b.due);
+  if(s.learn.length&&s.learn[0].due<=now)id=s.learn.shift().id;else if(s.queue.length)id=s.queue.shift();else if(s.learn.length)id=s.learn.shift().id;
+  const line=id&&S.cur.byId[id];
+  if(!line){S.view='done';render();window.scrollTo(0,0);return}
+  Object.assign(s,{line,checked:false,res:null,acc:0,sug:2,hints:new Set(),blanks:blanksFor(line,S.cur.set.level),recHTML:''});
+  S.view='study';render();
+}
+function doCheck(reveal){
+  const s=S.sess;if(s.checked)return;
+  if(S.cur.set.level==='recite'){const r=reciteCheck(s.line,reveal?'':($('#recite')||{}).value||'');s.acc=r.acc;s.recHTML=r.html}
+  else{commitAll(true);finishCard(reveal);return}
+  s.sug=reveal?0:suggest(s.acc,s.hints.size>0);s.checked=true;render();
+  const b=$('.grades .sug');if(b)b.focus({preventScroll:true});
+}
+function gradeCard(g){
+  const s=S.sess;if(!s.checked)return;const c=schedule(S.cur.srs[s.line.id],g);S.cur.srs[s.line.id]=c;saveSrs();
+  s.done++;s.score+=s.acc;
+  if(s.mode==='review'){if(c.due-Date.now()<20*MIN)s.learn.push({id:s.line.id,due:c.due})}
+  else if(g===0)s.queue.splice(Math.min(3,s.queue.length),0,s.line.id);
+  nextCard();
+}
+function wholeCheck(){
+  const w=S.whole,lvl=S.cur.set.level;let tot=0,n=0;
+  if(lvl==='recite'){$$('textarea.rec').forEach(ta=>{const l=S.cur.byId[ta.dataset.l];const r=reciteCheck(l,ta.value);w.rec[l.id]=r.html;tot+=r.acc;n++;S.cur.srs[l.id]=schedule(S.cur.srs[l.id],suggest(r.acc,false))})}
+  else{commitAll(true);const by={};$$('.blank').forEach(i=>{(by[i.dataset.l]=by[i.dataset.l]||[]).push(i)});
+    for(const id in by){const res={};let pts=0;by[id].forEach(i=>{res[+i.dataset.i]=blankRes(i);pts+=blankCredit(i,false)});const acc=pts/by[id].length;
+      w.res[id]=res;tot+=acc;n++;if(!w.graded.has(id)){S.cur.srs[id]=schedule(S.cur.srs[id],suggest(acc,false));w.graded.add(id)}}}
+  saveSrs();w.acc=n?tot/n:1;w.checked=true;render();window.scrollTo(0,0);
+}
+
+const SAMPLE=`I. Causes of the American Revolution
+   A. Economic pressures
+      1. The Stamp Act of 1765 taxed printed materials in the colonies
+      2. The Townshend Acts taxed imported glass, paint, paper and tea
+   B. Political grievances
+      1. Colonists objected to "taxation without representation"
+      2. The colonies had no elected members in Parliament
+II. Key events
+   A. The Boston Massacre (1770): British soldiers killed five colonists
+   B. The Boston Tea Party (1773) protested the Tea Act
+   C. The Declaration of Independence was adopted on July 4, 1776
+      1. Written mainly by Thomas Jefferson
+      2. Asserted the unalienable rights of life, liberty and the pursuit of happiness`;
+
+render();
+</script>
+</body>
+</html>
